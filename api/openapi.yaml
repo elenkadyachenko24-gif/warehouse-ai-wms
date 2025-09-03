@@ -1,0 +1,61 @@
+openapi: 3.0.3
+info:
+  title: WarehouseAI WMS API
+  version: 1.0.0
+servers:
+  - url: https://api.example.com
+paths:
+  /api/v1/meta/health:
+    get:
+      summary: Health check
+      responses:
+        '200':
+          description: OK
+  /api/v1/ai/forecast:
+    post:
+      summary: Получить прогноз спроса
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                horizon:
+                  type: integer
+                  example: 14
+                items:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      sku:
+                        type: string
+                      warehouse_id:
+                        type: string
+                      history:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            date: { type: string, format: date }
+                            qty: { type: number }
+      responses:
+        '200':
+          description: Прогноз по позициям
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  forecasts:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        sku: { type: string }
+                        warehouse_id: { type: string }
+                        horizon: { type: integer }
+                        values:
+                          type: array
+                          items: { type: number }

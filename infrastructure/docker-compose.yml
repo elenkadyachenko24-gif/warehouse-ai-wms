@@ -1,0 +1,49 @@
+version: "3.9"
+services:
+  api:
+    image: mcr.microsoft.com/dotnet/aspnet:8.0
+    container_name: warehouseai-api
+    environment:
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__Default=Host=db;Database=warehouseai;Username=postgres;Password=postgres
+      - Jwt__Issuer=warehouseai
+      - Jwt__Key=dev-secret
+      - Rabbit__Host=rabbit
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+      - rabbit
+
+  mlworker:
+    image: python:3.11-slim
+    container_name: warehouseai-ml
+    command: ["python","-c","print('ML worker placeholder')"]
+    volumes:
+      - ./models:/app/models
+      - ./data:/app/data
+    depends_on:
+      - db
+      - rabbit
+
+  db:
+    image: postgres:16
+    container_name: warehouseai-db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=warehouseai
+    ports:
+      - "5432:5432"
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+
+  rabbit:
+    image: rabbitmq:3-management
+    container_name: warehouseai-rabbit
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+volumes:
+  dbdata:
